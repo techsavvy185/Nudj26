@@ -14,4 +14,5 @@ sealed interface ScreenRoute : NavKey {
         @Serializable
         data object DemoScreen : App
     }
+
 }
