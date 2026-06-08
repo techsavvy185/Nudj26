@@ -1,5 +1,7 @@
+<p align="center">
+  <img src="/app/src/main/ic_launcher-playstore.png" alt="Nudj Logo" width="180" height="180"/>
+</p>
 
-<h1 align="center"><b>Nudj</b></h1>
 <p align="center">
   Your campus, your events – all in one place.
 </p>
