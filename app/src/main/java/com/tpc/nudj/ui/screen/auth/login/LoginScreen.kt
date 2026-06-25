@@ -50,7 +50,7 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
 
 
-) {
+    ) {
     Scaffold(
         topBar = {
             NudjTopAppBar(
@@ -111,13 +111,13 @@ fun LoginScreenLayout(
             placeholder = "Enter your password",
             onPasswordVisibilityToggle = onPasswordVisibilityToggle
         )
-            TertiaryButton(
-                text = "Forgot Password?",
-                onClick = onForgotPasswordClick,
-                modifier = Modifier.align(Alignment.Start)
+        TertiaryButton(
+            text = "Forgot Password?",
+            onClick = onForgotPasswordClick,
+            modifier = Modifier.align(Alignment.Start)
 
 
-            )
+        )
 
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -161,7 +161,7 @@ fun LoginScreenLayout(
 
     }
 
-    }
+}
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
@@ -179,5 +179,3 @@ private fun LoginScreenLayoutPreview() {
         )
     }
 }
-
-
