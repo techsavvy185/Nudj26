@@ -9,34 +9,29 @@ import androidx.credentials.GetCredentialResponse
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.tpc.nudj.R
+import javax.inject.Inject
 
-class GoogleSignInClient(
-    private val context: Context
-) {
-    private val credentialManager = CredentialManager.create(context)
+class GoogleSignInClient @Inject constructor(){
 
-    suspend fun signIn(): String? {
+    suspend fun signIn(context: Context): String? {
+        val credentialManager = CredentialManager.create(context)
         return try {
-            val response = getCredentialResponse()
-            return handleSignIn(result = response)
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(
+                    GetGoogleIdOption.Builder()
+                        .setFilterByAuthorizedAccounts(false)
+                        .setServerClientId(context.getString(R.string.WEB_CLIENT_ID))
+                        .setAutoSelectEnabled(false)
+                        .build()
+                )
+                .build()
+
+            val response = credentialManager.getCredential(request = request, context = context)
+            handleSignIn(response)
         } catch (e: Exception) {
-            Log.i("GoogleSignInClient", "Error during Google sign-in: ${e.message}")
+            Log.e("GoogleSignInClient", "Error during Google sign-in: ${e.message}", e)
             null
         }
-        return null
-    }
-
-    private suspend fun getCredentialResponse(): GetCredentialResponse {
-        val request = GetCredentialRequest.Builder()
-            .addCredentialOption(
-                GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(context.getString(R.string.WEB_CLIENT_ID))
-                    .setAutoSelectEnabled(false)
-                    .build()
-            )
-            .build()
-        return credentialManager.getCredential(request = request, context = context)
     }
 
     private fun handleSignIn(result: GetCredentialResponse): String? {
