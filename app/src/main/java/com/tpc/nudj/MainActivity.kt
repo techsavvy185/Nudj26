@@ -29,7 +29,6 @@ import com.tpc.nudj.ui.theme.NudjTheme
 import com.tpc.nudj.viewmodels.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @AndroidEntryPoint
 
 class MainActivity : ComponentActivity() {
@@ -83,7 +82,7 @@ class MainActivity : ComponentActivity() {
                         entry<ScreenRoute.Auth.Landing>{
                             LandingScreen(
                                 onLandingScreenClick = {
-                                    backStack.add(ScreenRoute.Auth.Login)
+                                    backStack.add(ScreenRoute.Auth.Register)
                                 }
                             )
                         }
@@ -98,14 +97,32 @@ class MainActivity : ComponentActivity() {
                             RegisterScreen(
                                 onNavigateToLogin = {
                                     backStack.add(ScreenRoute.Auth.Login)
+                                },
+                                onNavigateToEmailVerification = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.Auth.EmailVerification)
+                                },
+                                onNavigateToUserDetailsInput = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.App.UserDetailsInput)
+                                },
+                                onNavigateToClubVerificationScreen = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.App.ClubVerificationScreen)
                                 }
+
                             )
                         }
                         entry<ScreenRoute.Auth.EmailVerification> {
                             EmailVerificationScreen(
-                                onNavigateBack = {}
+                                onNavigateBack = {},
+                                onNavigateToEmailVerified = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.Auth.EmailVerified)
+                                }
                             )
                         }
+
                         entry<ScreenRoute.Auth.ForgotPassword> {
                             ForgetPasswordScreen(
                                 onLoginClick = {}
@@ -119,7 +136,16 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         entry<ScreenRoute.Auth.EmailVerified> {
-                            EmailVerifiedScreen()
+                            EmailVerifiedScreen(
+                                onNavigateToUserDetailsInput = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.App.UserDetailsInput)
+                                },
+                                onNavigateToClubVerificationScreen = {
+                                    backStack.clear()
+                                    backStack.add(ScreenRoute.App.ClubVerificationScreen)
+                                }
+                            )
                         }
                         entry<ScreenRoute.App.StudentDashboard>{
                             DemoScreen(text = "Student Dashboard")
@@ -129,6 +155,9 @@ class MainActivity : ComponentActivity() {
                         }
                         entry<ScreenRoute.App.ClubVerificationScreen>{
                             DemoScreen(text = "Club Verification Dashboard")
+                        }
+                        entry<ScreenRoute.App.UserDetailsInput> {
+                            DemoScreen(text = "User Details Input")
                         }
                     }
                 )

@@ -67,4 +67,5 @@ interface AuthRepository {
      * Signs out the current user.
      */
     suspend fun signOut()
+    suspend fun reloadAndCheckEmailVerified(): Boolean
 }

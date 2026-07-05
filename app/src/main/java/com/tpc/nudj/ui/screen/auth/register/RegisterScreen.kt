@@ -10,13 +10,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,24 +46,57 @@ import com.tpc.nudj.viewmodels.auth.register.RegisterViewModel
 fun RegisterScreen(
     viewmodel: RegisterViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
+    onNavigateToEmailVerification: () -> Unit,
+    onNavigateToUserDetailsInput :() -> Unit,
+    onNavigateToClubVerificationScreen: () -> Unit
 ) {
     val uiState by viewmodel.registerUiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewmodel.events.collect { it ->
+            when (it) {
+                is RegisterEvent.ShowSnackBar -> {
+                    snackBarHostState.showSnackbar(it.message)
+                }
 
-    LoadingIndicator(
-        isLoading = uiState.isLoading
-    ) {
-        RegisterScreenLayout(
-            uiState = uiState,
-            onEmailInput = { email -> viewmodel.onEmailChange(email) },
-            onPasswordInput = { pass -> viewmodel.onPasswordChange(pass) },
-            onConfirmPasswordInput = { pass -> viewmodel.onConfirmPasswordChange(pass) },
-            onPasswordVisibilityToggle = { viewmodel.onPasswordVisibilityToggle() },
-            onConfirmPasswordVisibilityToggle = { viewmodel.onConfirmPasswordVisibilityToggle() },
-            onRoleSelected = { role -> viewmodel.onRoleChange(role) },
-            onSignUpClick = viewmodel::onRegisterClick,
-            onGoogleClick = viewmodel::onGoogleClick,
-            onLoginClick = onNavigateToLogin
-        )
+                RegisterEvent.NavigateToEmailVerification -> {
+                    onNavigateToEmailVerification()
+                }
+                RegisterEvent.NavigateToUserDetailsInput -> {
+                    onNavigateToUserDetailsInput()
+                }
+                RegisterEvent.NavigateToClubVerificationScreen -> {
+                    onNavigateToClubVerificationScreen()
+                }
+            }
+
+
+        }
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        },
+        containerColor = LocalAppColors.current.background
+    ) {paddingValues ->
+        LoadingIndicator(
+            isLoading = uiState.isLoading
+        ) {
+            RegisterScreenLayout(
+                uiState = uiState,
+                onEmailInput = { email -> viewmodel.onEmailChange(email) },
+                onPasswordInput = { pass -> viewmodel.onPasswordChange(pass) },
+                onConfirmPasswordInput = { pass -> viewmodel.onConfirmPasswordChange(pass) },
+                onPasswordVisibilityToggle = { viewmodel.onPasswordVisibilityToggle() },
+                onConfirmPasswordVisibilityToggle = { viewmodel.onConfirmPasswordVisibilityToggle() },
+                onRoleSelected = { role -> viewmodel.onRoleChange(role) },
+                onSignUpClick = viewmodel::onRegisterClick,
+                onGoogleClick = {viewmodel.onGoogleClick(context) },
+                onLoginClick = onNavigateToLogin,
+                modifier = Modifier.padding(paddingValues)
+            )
+        }
     }
 }
 
@@ -73,19 +111,16 @@ fun     RegisterScreenLayout(
     onRoleSelected: (Role) -> Unit,
     onSignUpClick: () -> Unit,
     onGoogleClick: () -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    modifier: Modifier
 ) {
 
     val dividerAndTextColor = LocalAppColors.current.onBackground
     val currentRole = uiState.role
 
-    Scaffold(
-        containerColor = LocalAppColors.current.background
-    ) { paddingValues ->
-        Column(
+    Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -185,7 +220,6 @@ fun     RegisterScreenLayout(
                 )
                 HorizontalDivider(modifier = Modifier.weight(1f), color = dividerAndTextColor, thickness = 1.dp)
             }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedButton(
@@ -229,8 +263,8 @@ fun     RegisterScreenLayout(
                 )
             }
         }
-    }
 }
+
 
 @Composable
 private fun RoleSelectionButton(
@@ -261,7 +295,8 @@ fun PreviewRegisterScreen() {
             onRoleSelected = {},
             onSignUpClick = {},
             onGoogleClick = {},
-            onLoginClick = {}
+            onLoginClick = {},
+            modifier = Modifier
         )
     }
 }

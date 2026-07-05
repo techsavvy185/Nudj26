@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.clickable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,18 +37,44 @@ import kotlinx.coroutines.launch
 @Composable
 fun EmailVerificationScreen(
     viewModel: EmailVerificationViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToEmailVerified: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(Unit) {
+        viewModel.onScreenOpened()
+    }
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is EmailVerificationEvent.showSnackBar -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
 
-    LoadingIndicator(
-        isLoading = uiState.isLoading
-    ) {
-        EmailVerificationScreenLayout(
-            uiState = uiState,
-            onBackClick = onNavigateBack,
-            onResendEmailClick = { viewModel.onResendEmailClick() }
-        )
+                EmailVerificationEvent.NavigateToEmailVerified -> {
+                    onNavigateToEmailVerified()
+                }
+            }
+        }
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState)
+        },
+        containerColor = LocalAppColors.current.background
+    ) {paddingValues ->
+        LoadingIndicator(
+            isLoading = uiState.isLoading
+        ) {
+            EmailVerificationScreenLayout(
+                uiState = uiState,
+                onBackClick = onNavigateBack,
+                onResendEmailClick = { viewModel.onResendEmailClick() },
+                modifier = Modifier.padding(paddingValues),
+                onShowSnackBar = { message-> snackBarHostState.showSnackbar(message) }
+            )
+        }
     }
 }
 
@@ -55,23 +82,17 @@ fun EmailVerificationScreen(
 fun EmailVerificationScreenLayout(
     uiState: EmailVerificationUiState,
     onBackClick: () -> Unit,
-    onResendEmailClick: () -> Unit
+    onResendEmailClick: () -> Unit,
+    onShowSnackBar: suspend (String) -> Unit,
+    modifier: Modifier
 ) {
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val snackBarHostState = remember { SnackbarHostState() }
 
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-        containerColor = LocalAppColors.current.background
-    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -107,7 +128,7 @@ fun EmailVerificationScreenLayout(
                         context.startActivity(chooser)
                     } catch (e: Exception){
                         scope.launch {
-                            snackBarHostState.showSnackbar("No Email app found")
+                            onShowSnackBar("No email app found")
                         }
                     }
                 },
@@ -138,7 +159,7 @@ fun EmailVerificationScreenLayout(
         }
 
     }
-}
+
 
 @Preview(showBackground = true)
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -148,7 +169,9 @@ fun PreviewEmailVerificationScreen() {
         EmailVerificationScreenLayout(
             uiState = EmailVerificationUiState(),
             onBackClick = {},
-            onResendEmailClick = {}
+            onResendEmailClick = {},
+            modifier = Modifier,
+            onShowSnackBar = {}
         )
     }
 }

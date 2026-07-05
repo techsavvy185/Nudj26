@@ -34,4 +34,5 @@ interface UserRepository {
     suspend fun userExists(userId: String): Boolean
 
     suspend fun clubExists(clubId: String): Boolean
+
 }
