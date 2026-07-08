@@ -68,7 +68,6 @@ fun NudjDropDownMenu(
             onDismissRequest = { onExpandedStateChange(false) },
             modifier = Modifier
                 .background(color = LocalAppColors.current.textFieldColor)
-                .padding(12.dp)
                 .exposedDropdownSize(),
             shape = RoundedCornerShape(15.dp),
         ) {

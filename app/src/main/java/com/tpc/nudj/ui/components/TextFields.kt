@@ -70,6 +70,7 @@ fun NudjTextField(
                 focusedBorderColor = LocalAppColors.current.textFieldBorderColor,
                 unfocusedBorderColor = LocalAppColors.current.textFieldBorderColor,
                 focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black,
                 focusedLeadingIconColor = Color.Black,
                 unfocusedLeadingIconColor = Color.Black,
                 focusedPlaceholderColor = Color(0xFF728C9D),
