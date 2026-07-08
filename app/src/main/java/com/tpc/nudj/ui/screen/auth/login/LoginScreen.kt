@@ -28,8 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,6 +60,7 @@ import com.tpc.nudj.ui.components.LoadingIndicator
 import com.tpc.nudj.ui.components.NudjLogo
 import com.tpc.nudj.ui.components.NudjTopAppBar
 import com.tpc.nudj.ui.components.SecondaryButton
+import com.tpc.nudj.ui.navigation.ScreenRoute
 import com.tpc.nudj.ui.theme.LocalAppColors
 
 
@@ -64,8 +69,18 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     navigateToCreateAccount: () ->Unit
 ) {
-    Scaffold(containerColor = LocalAppColors.current.background) { paddingValues ->
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    Scaffold(containerColor = LocalAppColors.current.background,
+        snackbarHost = {SnackbarHost(hostState = snackbarHostState)}) { paddingValues ->
         val uiState by viewModel.loginUiState.collectAsState()
+        LaunchedEffect(uiState.errorMessage) {
+            val error = uiState.errorMessage
+            if(error!=null){
+                snackbarHostState.showSnackbar(error)
+                viewModel.clearError()
+            }
+        }
         LoadingIndicator(isLoading = uiState.isLoading) {
             LoginScreenLayout(
                 modifier = Modifier.padding(paddingValues),
@@ -78,7 +93,7 @@ fun LoginScreen(
                 },
                 onForgotPasswordClick = viewModel::onForgotPasswordClick,
                 onLoginClick = viewModel::onLoginClick,
-                onGoogleClick = viewModel::onGoogleClick,
+                onGoogleClick = {viewModel.onGoogleClick(context)},
                 onPasswordVisibilityToggle = viewModel::togglePasswordVisibility,
                 onRoleSelected = { role ->
                     viewModel.onRoleSelected(role)

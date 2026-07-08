@@ -174,7 +174,7 @@ class RegisterViewModel @Inject constructor(
                 return@launch
             }
             try {
-                authRepository.signInWithGoogle(idToken).collect { result ->
+                authRepository.signInWithGoogle(idToken,_registerUiState.value.role).collect { result ->
                     when (result) {
                         is AuthResult.Loading -> {
                             _registerUiState.update {

@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.tpc.nudj.ui.navigation.ScreenRoute
 import com.tpc.nudj.ui.screen.DemoScreen
+import com.tpc.nudj.ui.screen.auth.clubVerification.ClubVerificationScreen
 import com.tpc.nudj.ui.screen.auth.emailVerification.EmailVerificationScreen
 import com.tpc.nudj.ui.screen.auth.emailVerified.EmailVerifiedScreen
 import com.tpc.nudj.ui.screen.auth.forgotPassword.ForgetPasswordScreen
@@ -25,6 +26,7 @@ import com.tpc.nudj.ui.screen.auth.login.LoginScreen
 import com.tpc.nudj.ui.screen.auth.register.RegisterScreen
 import com.tpc.nudj.ui.screen.auth.reset.ResetPasswordScreen
 import com.tpc.nudj.ui.screen.auth.splash.SplashScreen
+import com.tpc.nudj.ui.screen.club.clubLanding.ClubLandingScreen
 import com.tpc.nudj.ui.theme.NudjTheme
 import com.tpc.nudj.viewmodels.AppViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -151,10 +153,10 @@ class MainActivity : ComponentActivity() {
                             DemoScreen(text = "Student Dashboard")
                         }
                         entry<ScreenRoute.App.ClubDashboard>{
-                            DemoScreen(text = "Club Dashboard")
+                            ClubLandingScreen()
                         }
                         entry<ScreenRoute.App.ClubVerificationScreen>{
-                            DemoScreen(text = "Club Verification Dashboard")
+                            ClubVerificationScreen(onNavigationBack = {})
                         }
                         entry<ScreenRoute.App.UserDetailsInput> {
                             DemoScreen(text = "User Details Input")

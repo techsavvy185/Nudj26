@@ -35,7 +35,6 @@ class AppViewModel @Inject constructor(
 
     init {
         observeAuthState()
-        refreshAuthState()
     }
 
     fun refreshAuthState() {
@@ -102,6 +101,9 @@ class AppViewModel @Inject constructor(
             authRepository.getCurrentUser().collect { user ->
                 if (user == null) {
                     _authState.value = AuthState.Unauthenticated
+                }
+                else{
+                    resolveInitialDestination()
                 }
             }
         }
